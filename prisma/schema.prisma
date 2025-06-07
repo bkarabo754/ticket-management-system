@@ -1,0 +1,66 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ticket {
+  id            String     @id @default(cuid())
+  title         String
+  description   String
+  status        TicketStatus @default(OPEN)
+  priority      Priority     @default(MEDIUM)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  createdById   String
+  assignedToId  String?
+  comments      Comment[]
+  activities    Activity[]
+
+  @@index([createdById])
+  @@index([assignedToId])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  authorId    String
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([ticketId])
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  action      String
+  createdAt   DateTime @default(now())
+  userId      String
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  details     String?
+
+  @@index([userId])
+  @@index([ticketId])
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
