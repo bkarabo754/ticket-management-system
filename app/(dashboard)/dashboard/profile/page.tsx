@@ -18,7 +18,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { CalendarDays, Mail, Shield, User, Clock, Ticket } from 'lucide-react';
 import { toast } from 'sonner';
-import { getUserRole } from '@/lib/auth';
+
+import { getUserRole } from '@/lib/utils/client-auth-utils';
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser();

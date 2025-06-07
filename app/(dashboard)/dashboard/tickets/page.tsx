@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { DataTable } from '@/components/tickets/data-table';
 import { columns } from '@/components/tickets/columns';
-import { getUserRole } from '@/lib/auth';
 import { TableSkeleton } from '@/components/tickets/table-skeleton';
+import { getUserRole } from '@/lib/utils/client-auth-utils';
 
 export default async function TicketsPage() {
   const user = await currentUser();

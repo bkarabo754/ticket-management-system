@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Overview } from '@/components/dashboard/overview';
 import { RecentTickets } from '@/components/dashboard/recent-tickets';
 import { DashboardSkeleton } from '@/components/dashboard/dashboard-skeleton';
-import { getUserRole } from '@/lib/auth';
+import { getUserRole } from '@/lib/utils/client-auth-utils';
 
 export default async function DashboardPage() {
   const user = await currentUser();

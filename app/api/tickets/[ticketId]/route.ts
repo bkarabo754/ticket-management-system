@@ -1,7 +1,8 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { isUserAdmin, isUserAgent } from '@/lib/auth';
+import { isUserAdmin, isUserAgent } from '@/lib/utils/server-auth-utils';
+// import { isUserAdmin, isUserAgent } from '@/lib/server-auth-utils';
 
 export async function GET(
   req: Request,

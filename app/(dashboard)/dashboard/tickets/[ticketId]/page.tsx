@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommentList } from '@/components/tickets/comment-list';
-import { TicketStatusBadge } from '@/components/tickets/ticket.status-badge';
+import { TicketStatusBadge } from '@/components/tickets/ticket-status-badge';
 
 const statusColorMap = {
   OPEN: 'default',

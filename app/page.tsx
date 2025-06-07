@@ -2,7 +2,7 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { buttonVariants } from '@/components/ui/button';
 import { UserNav } from '@/components/user-nav';
 import { auth } from '@clerk/nextjs/server';
-import { ArrowRight, LayoutDashboard, Menu, X } from 'lucide-react';
+import { ArrowRight, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 export default async function Home() {
   const { userId } = await auth();
