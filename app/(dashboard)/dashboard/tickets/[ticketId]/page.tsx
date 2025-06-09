@@ -5,11 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import { useAuth } from '@clerk/nextjs';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -39,6 +39,7 @@ const priorityColorMap = {
 export default function TicketPage() {
   const params = useParams();
   const router = useRouter();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
   type Priority = keyof typeof priorityColorMap;
   type Ticket = {
     id: string;
@@ -59,7 +60,10 @@ export default function TicketPage() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const response = await axios.get(`/api/tickets/${params.ticketId}`);
+        const token = await getToken();
+        const response = await axios.get(`/api/tickets/${params.ticketId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setTicket(response.data);
       } catch (error) {
         console.error(error);
@@ -79,14 +83,21 @@ export default function TicketPage() {
 
     setSubmittingComment(true);
     try {
-      await axios.post(`/api/tickets/${params.ticketId}/comments`, {
-        content: comment,
-      });
+      const token = await getToken();
+      await axios.post(
+        `/api/tickets/${params.ticketId}/comments`,
+        { content: comment },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       toast.success('Comment added');
       setComment('');
 
       // Refresh ticket data to get the new comment
-      const response = await axios.get(`/api/tickets/${params.ticketId}`);
+      const response = await axios.get(`/api/tickets/${params.ticketId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setTicket(response.data);
     } catch (error) {
       console.error(error);
@@ -164,7 +175,7 @@ export default function TicketPage() {
               Ticket #{ticket.id.substring(0, 8)} · Created{' '}
               {formatDistanceToNow(new Date(ticket.createdAt), {
                 addSuffix: true,
-              })}
+              })}{' '}
               <Badge variant={priorityColorMap[ticket.priority as Priority]}>
                 {ticket.priority}
               </Badge>
@@ -224,6 +235,7 @@ export default function TicketPage() {
                 <Button
                   onClick={handleSubmitComment}
                   disabled={!comment.trim() || submittingComment}
+                  className="cursor-pointer"
                 >
                   {submittingComment ? 'Submitting...' : 'Add Comment'}
                 </Button>

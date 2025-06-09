@@ -22,7 +22,7 @@ export default async function TicketsPage() {
         <h2 className="text-3xl font-bold tracking-tight">Tickets</h2>
         {role !== 'CUSTOMER' && (
           <Link href="/dashboard/tickets/new">
-            <Button>
+            <Button className="cursor-pointer">
               <Plus className="mr-2 h-4 w-4" />
               New Ticket
             </Button>

@@ -13,39 +13,39 @@ export async function POST(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    // --- ADDED: Await params here ---
+    const { ticketId } = await params;
+
     const body = await req.json();
     const { content } = body;
 
     if (!content) {
       return new NextResponse('Missing content', { status: 400 });
-    }
+    } // Check if ticket exists
 
-    // Check if ticket exists
     const ticket = await db.ticket.findUnique({
       where: {
-        id: params.ticketId,
+        id: ticketId,
       },
     });
 
     if (!ticket) {
       return new NextResponse('Ticket not found', { status: 404 });
-    }
+    } // Create comment
 
-    // Create comment
     const comment = await db.comment.create({
       data: {
         content,
         authorId: userId,
-        ticketId: params.ticketId,
+        ticketId: ticketId, // --- UPDATED: Use the awaited ticketId ---
       },
-    });
+    }); // Log activity
 
-    // Log activity
     await db.activity.create({
       data: {
         action: 'COMMENT_ADDED',
         userId,
-        ticketId: params.ticketId,
+        ticketId: ticketId, // --- UPDATED: Use the awaited ticketId ---
         details: 'Comment added to ticket',
       },
     });
@@ -68,21 +68,22 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Check if ticket exists
+    // --- ADDED: Await params here ---
+    const { ticketId } = await params; // Check if ticket exists
+
     const ticket = await db.ticket.findUnique({
       where: {
-        id: params.ticketId,
+        id: ticketId, // --- UPDATED: Use the awaited ticketId ---
       },
     });
 
     if (!ticket) {
       return new NextResponse('Ticket not found', { status: 404 });
-    }
+    } // Get comments
 
-    // Get comments
     const comments = await db.comment.findMany({
       where: {
-        ticketId: params.ticketId,
+        ticketId: ticketId,
       },
       orderBy: {
         createdAt: 'asc',
