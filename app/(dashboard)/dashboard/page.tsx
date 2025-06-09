@@ -21,9 +21,7 @@ export default async function DashboardPage() {
     redirect('/sign-in');
   }
 
-  const role = getUserRole(
-    user as unknown as import('@clerk/types').UserResource
-  );
+  const role = getUserRole(user as any);
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">

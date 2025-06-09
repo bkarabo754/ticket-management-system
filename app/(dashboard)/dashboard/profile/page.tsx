@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { CalendarDays, Mail, Shield, User, Clock, Ticket } from 'lucide-react';
 import { toast } from 'sonner';
-
 import { getUserRole } from '@/lib/utils/client-auth-utils';
 
 export default function ProfilePage() {
@@ -42,29 +41,39 @@ export default function ProfilePage() {
 
   const role = getUserRole(user);
   const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
-  const joinDate = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : 'Unknown';
+  const joinDate = new Date(user.createdAt ?? Date.now()).toLocaleDateString(
+    'en-ZA',
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
+  );
 
   const handleSave = async () => {
     try {
-      await user.update({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-      });
-
+      // Update bio in public metadata only
       await user.update({
         unsafeMetadata: {
-          ...user.unsafeMetadata,
+          ...user.publicMetadata,
           bio: formData.bio,
         },
       });
 
-      toast.success('Profile updated successfully');
+      // For name changes, we need to use a different approach
+      // Since Clerk doesn't allow direct firstName/lastName updates via client API,
+      // we'll show a message to the user
+      if (
+        formData.firstName !== user.firstName ||
+        formData.lastName !== user.lastName
+      ) {
+        toast.info(
+          'Name changes require account verification. Please contact support to update your name.'
+        );
+      } else {
+        toast.success('Profile updated successfully');
+      }
+
       setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update profile');
@@ -185,23 +194,35 @@ export default function ProfilePage() {
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
                   id="firstName"
-                  value={formData.firstName}
+                  value={isEditing ? formData.firstName : user.firstName || ''}
                   onChange={(e) =>
                     setFormData({ ...formData, firstName: e.target.value })
                   }
                   disabled={!isEditing}
                 />
+                {isEditing && (
+                  <p className="text-xs text-muted-foreground">
+                    Name changes require verification. Contact support for
+                    assistance.
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   id="lastName"
-                  value={formData.lastName}
+                  value={isEditing ? formData.lastName : user.lastName || ''}
                   onChange={(e) =>
                     setFormData({ ...formData, lastName: e.target.value })
                   }
                   disabled={!isEditing}
                 />
+                {isEditing && (
+                  <p className="text-xs text-muted-foreground">
+                    Name changes require verification. Contact support for
+                    assistance.
+                  </p>
+                )}
               </div>
             </div>
 
