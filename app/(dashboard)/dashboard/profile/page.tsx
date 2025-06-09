@@ -26,7 +26,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    bio: (user?.publicMetadata?.bio as string) || '',
+    bio: (user?.unsafeMetadata?.bio as string) || '',
   });
 
   if (!isLoaded || !user) {
@@ -55,7 +55,6 @@ export default function ProfilePage() {
       // Update bio in public metadata only
       await user.update({
         unsafeMetadata: {
-          ...user.publicMetadata,
           bio: formData.bio,
         },
       });
@@ -85,7 +84,7 @@ export default function ProfilePage() {
     setFormData({
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      bio: (user.publicMetadata?.bio as string) || '',
+      bio: (user.unsafeMetadata?.bio as string) || '',
     });
     setIsEditing(false);
   };
