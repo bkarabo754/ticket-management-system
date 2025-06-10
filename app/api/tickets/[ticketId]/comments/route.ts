@@ -13,8 +13,7 @@ export async function POST(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // --- ADDED: Await params here ---
-    const { ticketId } = await params;
+    const { ticketId } = params;
 
     const body = await req.json();
     const { content } = body;
@@ -68,12 +67,11 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // --- ADDED: Await params here ---
-    const { ticketId } = await params; // Check if ticket exists
+    const { ticketId } = params; // Check if ticket exists
 
     const ticket = await db.ticket.findUnique({
       where: {
-        id: ticketId, // --- UPDATED: Use the awaited ticketId ---
+        id: ticketId, // Use the awaited ticketId ---
       },
     });
 
