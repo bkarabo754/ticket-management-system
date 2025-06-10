@@ -1,14 +1,17 @@
+// app/api/tickets/[ticketId]/comments/route.ts
+
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
-interface RouteContext {
-  params: {
-    ticketId: string;
-  };
-}
+// Remove the RouteContext interface as it's causing issues on Vercel
+// interface RouteContext {
+//   params: {
+//     ticketId: string;
+//   };
+// }
 
-export async function POST(req: Request, context: RouteContext) {
+export async function POST(req: Request, args: any) {
   try {
     const { userId } = await auth();
 
@@ -16,7 +19,8 @@ export async function POST(req: Request, context: RouteContext) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { ticketId } = context.params; // Access ticketId via context.params
+    // Access params from the 'any' typed argument (args.params)
+    const { ticketId } = args.params;
 
     const body = await req.json();
     const { content } = body;
@@ -59,10 +63,7 @@ export async function POST(req: Request, context: RouteContext) {
   }
 }
 
-export async function GET(
-  req: Request,
-  context: RouteContext // Use the explicit context object
-) {
+export async function GET(req: Request, args: any) {
   try {
     const { userId } = await auth();
 
@@ -70,7 +71,7 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { ticketId } = context.params; // Access ticketId via context.params
+    const { ticketId } = args.params;
 
     const ticket = await db.ticket.findUnique({
       where: {
