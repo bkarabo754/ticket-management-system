@@ -17,14 +17,16 @@ export default async function TicketsPage() {
   );
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Tickets</h2>
+    <div className="flex flex-col space-y-4 p-4 pt-6 sm:p-6 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+          Tickets
+        </h2>
         {role !== 'CUSTOMER' && (
           <Link href="/dashboard/tickets/new">
-            <Button className="cursor-pointer">
-              <Plus className="mr-2 h-4 w-4" />
-              New Ticket
+            <Button className="flex items-center gap-2 cursor-pointer">
+              <Plus className="h-4 w-4" />
+              <span>New Ticket</span>
             </Button>
           </Link>
         )}

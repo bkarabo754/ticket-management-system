@@ -1,23 +1,28 @@
-import { ModeToggle } from '@/components/mode-toggle';
 import { buttonVariants } from '@/components/ui/button';
-import { UserNav } from '@/components/user-nav';
-import { auth } from '@clerk/nextjs/server';
-import { ArrowRight, LayoutDashboard } from 'lucide-react';
+import { ArrowRight, Menu } from 'lucide-react';
 import Link from 'next/link';
+import { UserNav } from '@/components/user-nav';
+import { ModeToggle } from '@/components/mode-toggle';
+import { auth } from '@clerk/nextjs/server';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+
 export default async function Home() {
   const { userId } = await auth();
   const isAuthenticated = !!userId;
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="fixed top-0 w-full border-b bg-white dark:bg-zinc-950 backdrop-blur z-50 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center">
           <div className="mr-4 flex">
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-xl font-bold">TicketHub</span>
             </Link>
           </div>
-          <div className="flex flex-1 items-center justify-end space-x-4">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center gap-4">
               {isAuthenticated ? (
                 <>
@@ -28,11 +33,9 @@ export default async function Home() {
                       size: 'sm',
                     })}
                   >
-                    <LayoutDashboard className="h-4 w-4" />
                     Dashboard
                   </Link>
                   <UserNav />
-                  <ModeToggle />
                 </>
               ) : (
                 <>
@@ -51,10 +54,46 @@ export default async function Home() {
                   >
                     Get Started
                   </Link>
-                  <ModeToggle />
                 </>
               )}
             </nav>
+            <ModeToggle />
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="flex md:hidden flex-1 items-center justify-end space-x-2">
+            <ModeToggle />
+            {isAuthenticated ? (
+              <UserNav />
+            ) : (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px]">
+                  <nav className="flex flex-col gap-4 mt-8">
+                    <Link
+                      href="/sign-in"
+                      className={buttonVariants({
+                        variant: 'outline',
+                        size: 'sm',
+                      })}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className={buttonVariants({ size: 'sm' })}
+                    >
+                      Get Started
+                    </Link>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </header>
@@ -205,11 +244,10 @@ export default async function Home() {
           </div>
         </section>
       </main>
-      <footer className="border-t py-6 md:py-8">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row px-4 md:px-8">
-          <p className="text-sm text-muted-foreground text-center md:text-left">
-            Copyright &copy; {new Date().getFullYear()} TicketHub (Pty) Ltd. All
-            rights reserved.
+      <footer className="border-t py-6 md:py-0">
+        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} TicketHub. All rights reserved.
           </p>
           <div className="flex gap-4">
             <Link
