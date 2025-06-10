@@ -1,20 +1,14 @@
-// app/api/tickets/[ticketId]/comments/route.ts
-
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
-// Define an interface for the context to ensure strict typing
 interface RouteContext {
   params: {
     ticketId: string;
   };
 }
 
-export async function POST(
-  req: Request,
-  context: RouteContext // Use the explicit context object
-) {
+export async function POST(req: Request, context: RouteContext) {
   try {
     const { userId } = await auth();
 
