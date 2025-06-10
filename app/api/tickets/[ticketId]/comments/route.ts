@@ -4,10 +4,16 @@ import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
+// Define an interface for the context to ensure strict typing
+interface RouteContext {
+  params: {
+    ticketId: string;
+  };
+}
+
 export async function POST(
   req: Request,
-  // Use a more generic Record type for params
-  { params }: { params: Record<string, string> }
+  context: RouteContext // Use the explicit context object
 ) {
   try {
     const { userId } = await auth();
@@ -16,7 +22,7 @@ export async function POST(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { ticketId } = params;
+    const { ticketId } = context.params; // Access ticketId via context.params
 
     const body = await req.json();
     const { content } = body;
@@ -61,8 +67,7 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  // Use a more generic Record type for params
-  { params }: { params: Record<string, string> }
+  context: RouteContext // Use the explicit context object
 ) {
   try {
     const { userId } = await auth();
@@ -71,7 +76,7 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { ticketId } = params;
+    const { ticketId } = context.params; // Access ticketId via context.params
 
     const ticket = await db.ticket.findUnique({
       where: {
