@@ -1,12 +1,11 @@
+// app/api/tickets/[ticketId]/route.ts
+
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { isUserAdmin, isUserAgent } from '@/lib/utils/server-auth-utils';
 
-export async function GET(
-  req: Request,
-  { params }: { params: { ticketId: string } }
-) {
+export async function GET(req: Request, context: any) {
   try {
     const { userId } = await auth();
 
@@ -14,12 +13,12 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Await params before accessing ticketId
-    const { ticketId } = await params; // <--- ADD AWAIT HERE
+    // Access params from the 'any' typed context
+    const { ticketId } = context.params;
 
     const ticket = await db.ticket.findUnique({
       where: {
-        id: ticketId, // <--- Use the destructured ticketId
+        id: ticketId,
       },
       include: {
         comments: {
@@ -32,7 +31,7 @@ export async function GET(
 
     if (!ticket) {
       return new NextResponse('Ticket not found', { status: 404 });
-    } // Check permissions based on role
+    }
 
     const isAdmin = await isUserAdmin(userId);
     const isAgent = await isUserAgent(userId);
@@ -48,10 +47,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { ticketId: string } }
-) {
+export async function PATCH(req: Request, context: any) {
   try {
     const { userId } = await auth();
 
@@ -59,11 +55,10 @@ export async function PATCH(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Await params before accessing ticketId
-    const { ticketId } = await params; // <--- ADD AWAIT HERE
+    const { ticketId } = context.params;
 
     const isAdmin = await isUserAdmin(userId);
-    const isAgent = await isUserAgent(userId); // Only admins and agents can update tickets
+    const isAgent = await isUserAgent(userId);
 
     if (!isAdmin && !isAgent) {
       return new NextResponse('Unauthorized', { status: 403 });
@@ -74,17 +69,17 @@ export async function PATCH(
 
     const ticket = await db.ticket.findUnique({
       where: {
-        id: ticketId, // <--- Use the destructured ticketId
+        id: ticketId,
       },
     });
 
     if (!ticket) {
       return new NextResponse('Ticket not found', { status: 404 });
-    } // Update the ticket
+    }
 
     const updatedTicket = await db.ticket.update({
       where: {
-        id: ticketId, // <--- Use the destructured ticketId
+        id: ticketId,
       },
       data: {
         title,
@@ -93,13 +88,13 @@ export async function PATCH(
         priority,
         assignedToId,
       },
-    }); // Log activity
+    });
 
     await db.activity.create({
       data: {
         action: 'UPDATED',
         userId,
-        ticketId: ticketId, // <--- Use the destructured ticketId
+        ticketId: ticketId,
         details: 'Ticket updated',
       },
     });
@@ -111,10 +106,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { ticketId: string } }
-) {
+export async function DELETE(req: Request, context: any) {
   try {
     const { userId } = await auth();
 
@@ -122,9 +114,7 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Await params before accessing ticketId
-    const { ticketId } = await params; // <--- ADD AWAIT HERE
-    // Only admins can delete tickets
+    const { ticketId } = context.params;
 
     const isAdmin = await isUserAdmin(userId);
 
@@ -134,13 +124,13 @@ export async function DELETE(
 
     const ticket = await db.ticket.findUnique({
       where: {
-        id: ticketId, // <--- Use the destructured ticketId
+        id: ticketId,
       },
     });
 
     if (!ticket) {
       return new NextResponse('Ticket not found', { status: 404 });
-    } // Delete the ticket
+    }
 
     await db.ticket.delete({
       where: {
